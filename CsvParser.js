@@ -34,7 +34,7 @@ module.exports = {
           var tempTime = [inputArray[j][1],inputArray[j][MADDIE_TIMES_INDEX], inputArray[j][MADDIE_TIMES_INDEX + 1], clinic]
           returnTimes.push(tempTime);
         }
-        else console.log("Day off!!");
+        //else //console.log("Day off!!");
       }
     }
     return returnTimes;
