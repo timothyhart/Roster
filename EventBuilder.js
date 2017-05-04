@@ -5,16 +5,18 @@ var moment = require('moment');
 var express = require('express');
 var app = express();
 
-app.use(express.static('public'));
-
+app.use('/static', express.static('public'));
+var events = [];
 app.get("/", (req, res) => {
   res.send(`<html>
   <head>
-  <link rel='stylesheet' href='fullcalendar.css' />
-  <script src='jquery.min.js'></script>
-  <script src='moment.min.js'></script>
-  <script src='fullcalendar.js'></script>
-  <script src='webCal.js'></script>
+  <link rel='stylesheet' href='/static/fullcalendar.css' />
+  <script src='/static/jquery.min.js'></script>
+  <script src='/static/moment.min.js'></script>
+  <script src='/static/fullcalendar.js'></script>
+  <script type='text/javascript'>
+    $(document).ready(function(){
+    $('#cal').fullCalendar({events: ${JSON.stringify(events)}})})</script>
   </head>
   <body>
   <div id='cal'></div>
@@ -55,16 +57,16 @@ async function wrapParse(file) {
   });
 
 }
-(async function x(){
+async function getEvents(){
 var file = await wrapReadFile("roster.csv");
 var parsed = await wrapParse(file);
 var months = parser.getMonths(parsed[0]);
 var times = parser.getTimes(parsed);
-var events = buildEvents(months, times);
+events = buildEvents(months, times);
 
 console.log(events);
-})().then(()=>{});
-
+};
+getEvents();
 var buildEvents = function(months, times){
   var currentProcDate = -1;
   var events = [];
