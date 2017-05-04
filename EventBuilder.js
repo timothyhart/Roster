@@ -41,10 +41,10 @@ var events = buildEvents(months, times);
 console.log(events);
 })().then(()=>{});
 
-const buildEvents = function(months, times){
+var buildEvents = function(months, times){
   var currentProcDate = -1;
-  const events = [];
-  const useSecondMonth = false;
+  var events = [];
+  var useSecondMonth = false;
   for (var i = 0; i < times.length; i++){
     if (currentProcDate < parseInt(times[i][0]) && !useSecondMonth){
       events.push(BuildEvent(months[0], times[i][0],times[i][1],times[i][2],times[i][3]));
@@ -58,7 +58,7 @@ const buildEvents = function(months, times){
   return events;
 }
 
-const BuildEvent = function(month, dayNumber, startTime, endTime, clinic){
+var BuildEvent = function(month, dayNumber, startTime, endTime, clinic){
   var startDateTime = dateTimeBuilder(month, dayNumber, startTime);
   var endDateTime = dateTimeBuilder(month, dayNumber, endTime);
 
@@ -72,12 +72,16 @@ const BuildEvent = function(month, dayNumber, startTime, endTime, clinic){
   return event;
 }
 
-const dateTimeBuilder = function(month, dayNumber, time){
+var dateTimeBuilder = function(month, dayNumber, time){
 
   var year = moment().year();
   var monthNum = getMonthNumberFromName(month);
 
-  return (year + "-" + monthNum + "-" + dayNumber + "T" + time );
+  var timeFormatted = time.length == 5 ? time : ("0" + time);
+  var monthFormatted = monthNum.length == 2 ? monthNum : ("0" + monthNum);
+  var dayFormatted = dayNumber.length == 2 ? dayNumber : ("0" + dayNumber);
+
+  return (year + "-" + monthFormatted + "-" + dayFormatted + "T" + timeFormatted );
 
 
 }
