@@ -47,7 +47,6 @@ const buildEvents = function(months, times){
   const useSecondMonth = false;
   for (var i = 0; i < times.length; i++){
     if (currentProcDate < parseInt(times[i][0]) && !useSecondMonth){
-
       events.push(BuildEvent(months[0], times[i][0],times[i][1],times[i][2],times[i][3]));
     } else if (currentProcDate > parseInt(times[i][0])){
       useSecondMonth = true;
