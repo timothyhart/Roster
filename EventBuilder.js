@@ -23,6 +23,11 @@ app.post('/upload' , async (req, res) => {
   const fileName = req.files.file.name;
   events = await getEvents(fileName)
   res.status('200');
+  events.forEach((item)=>{
+    jsonFile.writeFile(`store.json`, item, {flag: 'a'}, (err)=>{
+      console.log(err);
+    })
+  })
   const template = await wrapReadFileToString(`roster.html`)
 
   res.send(template.replace("{{events}}", JSON.stringify(events)));
