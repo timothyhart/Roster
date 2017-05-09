@@ -1,14 +1,49 @@
 <html>
 <head>
-<link rel='stylesheet' href='fullcalendar.css' />
-<script src='jquery.min.js'></script>
-<script src='moment.min.js'></script>
-<script src='fullcalendar.js'></script>
-<script src='webCal.js'></script>
+<link rel='stylesheet' href='/static/fullcalendar.css' />
+<script src='/static/jquery.min.js'></script>
+<script src='/static/moment.min.js'></script>
+<script src='/static/fullcalendar.js'></script>
+<script type='text/javascript'>
+  $(document).ready(function(){
+  $('#cal').fullCalendar({ events: {{events}},
+                      eventClick: function(calEvent, jsEvent, view) {
+                        var sdate = new Date(calEvent.start);
+                        var shours = sdate.getHours();
+                        var sminutes = "0" + sdate.getMinutes();
+                        var sseconds = "0" + sdate.getSeconds();
+
+                        var formattedStartTime = shours + ':' + sminutes.substr(-2) + ':' + sseconds.substr(-2);
+
+                        edate = new Date(calEvent.end);
+                        ehours = edate.getHours();
+                        eminutes = "0" + edate.getMinutes();
+                        eseconds = "0" + edate.getSeconds();
+
+                        var formattedEndTime = ehours + ':' + eminutes.substr(-2) + ':' + eseconds.substr(-2);
+                        console.log(formattedEndTime+ "   " + formattedStartTime)
+
+                            alert('Event: ' + calEvent.title + ' Start: ' + formattedEndTime + ' Knock-off: ' + formattedStartTime);
+                            //alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+                            //alert('View: ' + view.name);
+
+                            // change the border color just for fun
+                            $(this).css('border-color', 'red');
+
+},
+displayEventEnd: true})})</script>
 </head>
-<body>
-<div id='cal'></div>
-</body>
+  <body>
+    <form ref='uploadForm'
+      id='uploadForm'
+      action='http://localhost:1337/upload'
+      method='post'
+      encType="multipart/form-data">
+        <input type="file" name="file" />
+        <input type='submit' value='Engage Viewing' />
+    </form>
+  <div id='cal'></div>
+  </body>
 
 
-</html>
+  </html>

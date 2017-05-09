@@ -1,51 +1,59 @@
-var parser = require('./CsvParser.js');
-var fs = require('fs');
-var parse = require('csv-parse');
-var moment = require('moment');
-var express = require('express');
+const parser = require('./CsvParser.js');
+const fs = require('fs');
+const parse = require('csv-parse');
+const moment = require('moment');
+const express = require('express');
+const fileUpload = require('express-fileupload')
+const jsonFile = require('jsonfile')
+
 var app = express();
 
 app.use('/static', express.static('public'));
+
+
 var events = [];
-app.get("/", (req, res) => {
-  res.send(`<html>
-  <head>
-  <link rel='stylesheet' href='/static/fullcalendar.css' />
-  <script src='/static/jquery.min.js'></script>
-  <script src='/static/moment.min.js'></script>
-  <script src='/static/fullcalendar.js'></script>
-  <script type='text/javascript'>
-    $(document).ready(function(){
-    $('#cal').fullCalendar({events: ${JSON.stringify(events)}})})</script>
-  </head>
-  <body>
-  <div id='cal'></div>
-  </body>
+app.get("/", async (req, res) => {
+  const template = await wrapReadFileToString(`roster.html`)
 
+  res.send(template.replace("{{events}}", JSON.stringify({})));
+})
+app.use(fileUpload());
+app.post('/upload' , async (req, res) => {
+  console.log(req.files.file.name);
+  const fileName = req.files.file.name;
+  events = await getEvents(fileName)
+  res.status('200');
+  const template = await wrapReadFileToString(`roster.html`)
 
-  </html>`);
+  res.send(template.replace("{{events}}", JSON.stringify(events)));
 })
 
 app.listen(1337, () => {
-  console.log("All of the dicks");
+  console.log("Leet port open: Accepting leets");
 })
-var processData = function(err, output, callback){
-  if (err){
-    return console.log(err);
-  }
-  var months = parser.getMonths(output[0]);
-  //console.log(months);
-
-  var times = parser.getTimes(output);
-  console.log(months);
-
-}
+// var processData = function(err, output, callback){
+//   if (err){
+//     return console.log(err);
+//   }
+//   var months = parser.getMonths(output[0]);
+//   //console.log(months);
+//
+//   var times = parser.getTimes(output);
+//   console.log(months);
+//
+// }
 
 //console.log(parser.toString());
 // parser.getEvent(processData);
 async function wrapReadFile(name){
   return new Promise(resolve => {
     fs.readFile(name, (err, data) => resolve(data));
+  })
+}
+
+async function wrapReadFileToString(name){
+  return new Promise(resolve => {
+    fs.readFile(name, "utf-8" ,(err, data) => resolve(data));
   })
 }
 
@@ -57,16 +65,17 @@ async function wrapParse(file) {
   });
 
 }
-async function getEvents(){
-var file = await wrapReadFile("roster.csv");
+async function getEvents(fileName){
+  console.log("Getting Events");
+var file = await wrapReadFile(fileName);
 var parsed = await wrapParse(file);
 var months = parser.getMonths(parsed[0]);
 var times = parser.getTimes(parsed);
-events = buildEvents(months, times);
+return buildEvents(months, times);
 
-console.log(events);
+//console.log(events);
 };
-getEvents();
+//getEvents("roster.csv");
 var buildEvents = function(months, times){
   var currentProcDate = -1;
   var events = [];
@@ -101,6 +110,13 @@ var BuildEvent = function(month, dayNumber, startTime, endTime, clinic){
       start: startDateTime,
       end: endDateTime,
       color: 'red'
+    }
+  } else if(clinic.indexOf("M") !== -1){
+    var event = {
+      title: clinic,
+      start: startDateTime,
+      end: endDateTime,
+      color: "purple"
     }
   } else {
     var event = {
